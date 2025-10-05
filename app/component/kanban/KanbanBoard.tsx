@@ -6,10 +6,12 @@ import AddTaskForm from './AddTaskForm';
 import { Tasks, ColumnType, Task, Priority } from '../../types/kanban';
 import ConfirmationDialog from '../ui/ConfirmationDialog';
 import Modal from '../ui/Modal';
+import PriorityDropdown from '../filter/priorityDropdown';
 
 type PriorityFilter = 'all' | Priority;
 
 export default function KanbanBoard(): ReactNode {
+    
     const [tasks, setTasks] = useState<Tasks>({
         todo: [],
         inProgress: [],
@@ -18,10 +20,10 @@ export default function KanbanBoard(): ReactNode {
     const STORAGE_KEY = 'kanban-tasks';
     const [modalState, setModalState] = useState<{
         isOpen: boolean;
-        mode: 'add' | 'edit';
+        mode: 'create' | 'edit';
     }>({
         isOpen: false,
-        mode: 'add'
+        mode: 'create'
     });
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [draggedTask, setDraggedTask] = useState<{ taskId: number, fromColumn: ColumnType } | null>(null);
@@ -76,7 +78,7 @@ export default function KanbanBoard(): ReactNode {
 
         const { taskId, fromColumn } = draggedTask;
 
-        if (fromColumn === toColumn) {
+        if (fromColumn === toColumn) { 
             setDraggedTask(null);
             return;
         }
@@ -106,24 +108,44 @@ export default function KanbanBoard(): ReactNode {
                 id: Date.now()
             }]
         }));
-        setModalState({ isOpen: false, mode: 'add' });
+        setModalState({ isOpen: false, mode: 'create' });
     };
 
-    const updateTask = (updatedTask: Task) => {
-        setTasks(prev => {
-            const updatedTasks = { ...prev };
-            for (const column in updatedTasks) {
-                const col = column as ColumnType;
-                const index = updatedTasks[col].findIndex(t => t.id === updatedTask.id);
-                if (index !== -1) {
-                    updatedTasks[col][index] = updatedTask;
-                    break;
-                }
-            }
-            return updatedTasks;
-        });
-        setModalState({ isOpen: false, mode: 'add' });
-    };
+   const updateTask = (updatedTask: Task & { column: ColumnType }) => {
+  setTasks(prev => {
+    const newTasks = { ...prev };
+
+    // Find the column where the task currently exists
+    const currentColumn = (Object.keys(newTasks) as ColumnType[]).find(col =>
+      newTasks[col].some(task => task.id === updatedTask.id)
+    );
+
+    if (!currentColumn) return prev;
+
+    // If column changed → move task
+    if (currentColumn !== updatedTask.column) {
+      const taskToMove = newTasks[currentColumn].find(t => t.id === updatedTask.id);
+      if (!taskToMove) return prev;
+
+      newTasks[currentColumn] = newTasks[currentColumn].filter(t => t.id !== updatedTask.id);
+      newTasks[updatedTask.column] = [
+        ...newTasks[updatedTask.column],
+        { ...taskToMove, ...updatedTask },
+      ];
+    } else {
+      // If column same → update in place
+      newTasks[currentColumn] = newTasks[currentColumn].map(task =>
+        task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+      );
+    }
+
+    return newTasks;
+  });
+
+  // Close modal after update
+  setModalState({ isOpen: false, mode: 'create' });
+};
+
 
     const handleDeleteTask = (taskId: number) => {
         setTasks(prevTasks => {
@@ -138,7 +160,7 @@ export default function KanbanBoard(): ReactNode {
 
     const handleAddClick = () => {
         setEditingTask(null);
-        setModalState({ isOpen: true, mode: 'add' });
+        setModalState({ isOpen: true, mode: 'create' });
     };
 
     const handleEditTask = (task: Task) => {
@@ -148,66 +170,59 @@ export default function KanbanBoard(): ReactNode {
 
     return (
         <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 p-2 bg-white">Kanban Board</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 p-2 bg-white">Task Management Dashboard</h1>
             
 
             {/* Priority Filter Controls */}
             <div className="mb-6 flex flex-wrap items-center gap-4 justify-end">
-                <div className="flex items-center space-x-2">
-                    <span className="text-sm font-medium">Filter by priority:</span>
-                    <div className="flex space-x-1">
-                        {(['all', 'low', 'medium', 'high'] as PriorityFilter[]).map((filter) => (
-                            <button
-                                key={filter}
-                                onClick={() => setPriorityFilter(filter)}
-                                className={`px-3 py-1 text-sm rounded-md ${priorityFilter === filter
-                                    ? filter === 'all'
-                                        ? 'bg-gray-500 text-white'
-                                        : filter === 'high'
-                                            ? 'bg-red-500 text-white'
-                                            : filter === 'medium'
-                                                ? 'bg-yellow-500 text-white'
-                                                : 'bg-green-500 text-white'
-                                    : 'bg-gray-200 text-gray-800'
-                                    }`}
-                            >
-                                {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                 <PriorityDropdown 
+          priorityFilter={priorityFilter} 
+          setPriorityFilter={setPriorityFilter} 
+        />
             </div>
 
             {/* Modal for Add/Edit Task */}
-            <Modal
+           <Modal
                 isOpen={modalState.isOpen}
-                onClose={() => setModalState({ isOpen: false, mode: 'add' })}
-                title={modalState.mode === 'add' ? 'Add New Task' : 'Edit Task'}
+                onClose={() => setModalState({ isOpen: false, mode: 'create' })}
+                title={modalState.mode === 'create' ? 'Add New Task' : 'Edit Task'}
             >
                 <AddTaskForm
+                    mode={modalState.mode} // <-- explicitly pass mode
                     onSubmit={(taskData) => {
-                        if (modalState.mode === 'add') {
+                        if (modalState.mode === 'create') {
                             addNewTask(taskData);
                         } else if (editingTask) {
                             updateTask({ ...taskData, id: editingTask.id });
                         }
+
+                        // Reset modal and editingTask state
+                        setModalState({ isOpen: false, mode: 'create' });
+                        setEditingTask(null);
                     }}
-                    onCancel={() => setModalState({ isOpen: false, mode: 'add' })}
-                    initialData={editingTask ? {
-                        title: editingTask.title,
-                        description: editingTask.description,
-                        priority: editingTask.priority,
-                        column: Object.entries(tasks).find(([_, colTasks]) =>
-                            colTasks.some(t => t.id === editingTask.id)
-                        )?.[0] as ColumnType || 'todo'
-                    } : undefined}
+                    onCancel={() => {
+                        setModalState({ isOpen: false, mode: 'create' });
+                        setEditingTask(null);
+                    }}
+                    initialData={
+                        modalState.mode === 'edit' && editingTask
+                            ? {
+                                title: editingTask.title,
+                                description: editingTask.description,
+                                priority: editingTask.priority,
+                                column: (Object.keys(tasks).find(col =>
+                                    tasks[col as ColumnType].some(t => t.id === editingTask.id)
+                                ) as ColumnType) || 'todo',
+                            }
+                            : undefined
+                    }
                 />
             </Modal>
 
             {/* Add Task Button */}
             <button
                 onClick={handleAddClick}
-                className="fixed z-[99] bottom-8 right-8 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
+                className="fixed z-[99] bottom-8 right-8 bg-[#7e80e6] hover:bg-[#6366f1] text-white p-4 rounded-full shadow-lg flex items-center justify-center"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -231,6 +246,7 @@ export default function KanbanBoard(): ReactNode {
                     onDrop={handleDrop}
                     onEditTask={handleEditTask}
                     onDeleteTask={setTaskToDelete}
+                    onAddNewTask={addNewTask}
                 />
                 <KanbanColumn
                     title="In Progress"
@@ -240,6 +256,7 @@ export default function KanbanBoard(): ReactNode {
                     onDrop={handleDrop}
                     onEditTask={handleEditTask}
                     onDeleteTask={setTaskToDelete}
+                    onAddNewTask={addNewTask}
                 />
                 <KanbanColumn
                     title="Done"
@@ -249,6 +266,8 @@ export default function KanbanBoard(): ReactNode {
                     onDrop={handleDrop}
                     onEditTask={handleEditTask}
                     onDeleteTask={setTaskToDelete}
+                    onAddNewTask={addNewTask}
+                    
                 />
             </div>
 

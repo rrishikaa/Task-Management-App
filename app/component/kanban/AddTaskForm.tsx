@@ -2,20 +2,20 @@ import { Priority, Task, ColumnType } from "../../types/kanban";
 import { FormEvent, useState } from 'react';
 
 type Props = {
+    mode: 'create' | 'edit';
     onSubmit: (task: Omit<Task, 'id'> & { column: ColumnType }) => void;
     onCancel: () => void;
     initialData?: Omit<Task, 'id'> & { column: ColumnType };
 };
 
-export default function AddTaskForm({ onSubmit, onCancel, initialData }: Props) {
-    const [task, setTask] = useState<Omit<Task, 'id'> & { column: ColumnType }>(
-        initialData || {
-            title: '',
-            description: '',
-            priority: 'medium',
-            column: 'todo'
-        }
-    );
+
+export default function AddTaskForm({ mode, onSubmit, onCancel, initialData }: Props) {
+        const [task, setTask] = useState<Omit<Task, 'id'> & { column: ColumnType }>(() => ({
+            title: initialData?.title || '',
+            description: initialData?.description || '',
+            priority: initialData?.priority || 'medium', 
+            column: initialData?.column || 'todo',
+        }));
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -26,7 +26,7 @@ export default function AddTaskForm({ onSubmit, onCancel, initialData }: Props) 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-black mb-1">
                     Title *
                 </label>
                 <input
@@ -34,20 +34,20 @@ export default function AddTaskForm({ onSubmit, onCancel, initialData }: Props) 
                     placeholder="Task title"
                     value={task.title}
                     onChange={(e) => setTask({ ...task, title: e.target.value })}
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 border text-black rounded focus:ring-0 focus:ring-blue-500 "
                     required
                 />
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-black mb-1">
                     Description
                 </label>
                 <textarea
                     placeholder="Task description"
                     value={task.description}
                     onChange={(e) => setTask({ ...task, description: e.target.value })}
-                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 border text-black rounded focus:ring-1 focus:border-blue-500"
                     rows={3}
                 />
             </div>
@@ -62,7 +62,13 @@ export default function AddTaskForm({ onSubmit, onCancel, initialData }: Props) 
                             key={col}
                             type="button"
                             onClick={() => setTask({ ...task, column: col })}
-                            className={`py-2 rounded-md text-sm font-medium border ${task.column === col ? 'bg-blue-500 text-white border-blue-600' : 'bg-gray-100 text-gray-800 border-gray-300'}`}
+                            className={`py-2 rounded-md text-sm font-medium  ${task.column === col ? col === 'todo'
+                                        ? 'bg-[#6366f1] text-white'
+                                        : col === 'inProgress'
+                                            ? 'bg-amber-500 text-white'
+                                            : 'bg-green-500 text-white'
+                                    : 'bg-gray-200 text-gray-800'
+                                }`}
                         >
                             {col === 'todo' ? 'To Do' : col === 'inProgress' ? 'In Progress' : 'Done'}
                         </button>
@@ -99,15 +105,15 @@ export default function AddTaskForm({ onSubmit, onCancel, initialData }: Props) 
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                    className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 transition-colors"
                 >
                     Cancel
                 </button>
-                <button
+               <button
                     type="submit"
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
-                    {initialData ? 'Update Task' : 'Add Task'}
+                    {mode === 'edit' ? 'Update Task' : 'Add Task'}
                 </button>
             </div>
         </form>
