@@ -1,7 +1,7 @@
 // components/kanban/KanbanColumn.tsx
 import { DragEvent } from 'react';
 import KanbanTask from './KanbanTask';
-import { ColumnProps } from '@/types/kanban';
+import { ColumnProps } from '../../types/kanban';
 
 export default function KanbanColumn({
     title,

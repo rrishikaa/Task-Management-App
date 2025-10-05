@@ -19,6 +19,7 @@ export type ColumnProps = {
     onDragStart: (taskId: number, column: ColumnType) => void;
     onDrop: (column: ColumnType) => void;
     onEditTask?: (task: Task) => void;
+    onDeleteTask?: (taskId: number) => void;
 };
 
 export type TaskProps = {

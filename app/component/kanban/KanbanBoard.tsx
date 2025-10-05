@@ -3,7 +3,7 @@
 import { useState, ReactNode, useEffect } from 'react';
 import KanbanColumn from './KanbanColumn';
 import AddTaskForm from './AddTaskForm';
-import { Tasks, ColumnType, Task, Priority } from '@/types/kanban';
+import { Tasks, ColumnType, Task, Priority } from '../../types/kanban';
 import ConfirmationDialog from '../ui/ConfirmationDialog';
 import Modal from '../ui/Modal';
 

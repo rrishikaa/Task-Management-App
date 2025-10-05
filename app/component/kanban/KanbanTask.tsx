@@ -1,6 +1,6 @@
 // components/kanban/KanbanTask.tsx
 import { DragEvent } from 'react';
-import { TaskProps } from '@/types/kanban';
+import { TaskProps } from '../../types/kanban';
 
 export default function KanbanTask({ task, column, onDragStart, onEditTask, onDeleteTask }: TaskProps) {
     const handleDragStart = (e: DragEvent) => {
