@@ -1,4 +1,4 @@
-import { Priority, Task, ColumnType } from '@/types/kanban';
+import { Priority, Task, ColumnType } from "../../types/kanban";
 import { FormEvent, useState } from 'react';
 
 type Props = {
