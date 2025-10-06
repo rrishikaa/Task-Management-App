@@ -6,7 +6,7 @@ export type Task = {
     priority: Priority;
 };
 
-export type ColumnType = 'todo' | 'inProgress' | 'done';
+export type ColumnType = 'todo' | 'inProgress' | 'review' | 'done';
 
 export type Tasks = {
     [key in ColumnType]: Task[];

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-// NOTE: Make sure the path to your Sidebar component is correct
-import Sidebar from './component/navbar/SideNavbar'; 
-
+import Sidebar from "./component/navbar/SideNavbar"; 
+import Image from "next/image";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,25 +22,52 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const userInitials = "JD"; // You can dynamically replace this with actual user initials
+
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="flex h-screen overflow-hidden">
-          <Sidebar />
 
-          
+          {/* Sidebar (visible on lg and up) */}
+          <div className="hidden lg:block">
+            <Sidebar />
+          </div>
+
+          {/* Main Content Area */}
           <main className="flex-1 overflow-y-auto">
             
-            <div className="min-h-full pl-64">
+            {/* ✅ Mobile Logo & Profile (visible only on small screens) */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 lg:hidden">
+              {/* Logo */}
+              <Link href="/" className="flex items-center gap-2">
+                <div className="relative w-10 h-10">
+                  <Image
+                    src="/TaskLogo.svg"
+                    alt="Task Logo"
+                    fill
+                    sizes="40px"
+                    priority
+                    className="object-contain"
+                  />
+                </div>
+                <span className="text-xl font-bold text-gray-800">Stride</span>
+              </Link>
+
+              {/* Profile Circle */}
+              <div className="w-10 h-10 bg-indigo-500 text-white font-bold rounded-full flex items-center justify-center">
+                {userInitials}
+              </div>
+            </div>
+
+            {/* Page Content */}
+            <div className="min-h-full lg:pl-64">
               {children}
             </div>
           </main>
-          
         </div>
       </body>
     </html>

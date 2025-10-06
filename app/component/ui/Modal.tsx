@@ -13,7 +13,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 text-gray-400 bg-black/70 bg-opacity-100 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 text-black bg-black/70 bg-opacity-100 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div 
         className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
