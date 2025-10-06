@@ -53,7 +53,7 @@ export default function KanbanTask({ task, column, onDragStart, onEditTask, onDe
                         e.stopPropagation();
                         onDeleteTask(task.id);
                     }}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                    className="absolute -top-2 -right-2  bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
                 >
                     ×
                 </button>

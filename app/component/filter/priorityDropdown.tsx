@@ -83,7 +83,7 @@ const PriorityDropdown: React.FC<PriorityDropdownProps> = ({ priorityFilter, set
 
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 pr-4">
        
         <span className="text-md font-medium text-bold text-gray-700">Filter by priority:</span>
         

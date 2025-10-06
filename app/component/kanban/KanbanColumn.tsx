@@ -80,55 +80,55 @@ export default function KanbanColumn({
         >
             {/* Column Header */}
           <h2
-  className={`
-    ${currentStyle.bg} p-2 px-4 mb-4 
-    flex items-center justify-between 
-    rounded-full text-lg font-semibold shadow-md 
-    transition-all duration-200
-    overflow-hidden
-  `}
->
-  {/* Left Section: Column Title + Count */}
-  <span className="flex items-center gap-2 min-w-0">
-    <span
-      className={`
-        inline-flex items-center justify-center h-7 w-7 text-sm font-bold rounded-full 
-        ${currentStyle.counterBg} ${currentStyle.counterText}
-        flex-shrink-0
-      `}
-    >
-      {tasks.length}
-    </span>
+            className={`
+                ${currentStyle.bg} p-2 px-4 mb-4 
+                flex items-center justify-between 
+                rounded-full text-lg font-semibold shadow-md 
+                transition-all duration-200
+                overflow-hidden
+            `}
+            >
+            {/* Left Section: Column Title + Count */}
+            <span className="flex items-center gap-2 min-w-0">
+                <span
+                className={`
+                    inline-flex items-center justify-center h-7 w-7 text-sm font-bold rounded-full 
+                    ${currentStyle.counterBg} ${currentStyle.counterText}
+                    flex-shrink-0
+                `}
+                >
+                {tasks.length}
+                </span>
 
-    <span
-      className={`${currentStyle.text} text-base truncate`}
-      title={title}
-    >
-      {title}
-    </span>
-  </span>
+                <span
+                className={`${currentStyle.text} text-base truncate`}
+                title={title}
+                >
+                {title}
+                </span>
+            </span>
 
-  {/* + Button (hidden if space too tight) */}
-  <span className="ml-2 flex-shrink-0 overflow-hidden">
-    <button
-      type="button"
-      className={`
-        inline-flex items-center justify-center h-7 w-7 rounded-full 
-        ${currentStyle.counterBg} ${currentStyle.counterText}
-        hover:ring-2 hover:ring-offset-1 hover:ring-offset-transparent hover:ring-white/80
-        transition-all duration-150
-        max-sm:hidden
-      `}
-      onClick={() => setIsModalOpen(true)}
-      aria-label={`Add new task to ${title}`}
-    >
-      <PlusIcon className="h-4 w-4" aria-hidden="true" />
-    </button>
-  </span>
-</h2>
+            {/* + Button (hidden if space too tight) */}
+        <span className="ml-2 flex-shrink-0 overflow-visible">
+            <button
+            type="button"
+            className={`
+                inline-flex items-center justify-center h-7 w-7 rounded-full 
+                ${currentStyle.counterBg} ${currentStyle.counterText}
+                hover:ring-2 hover:ring-offset-1 hover:ring-offset-transparent hover:ring-white/80
+                transition-all duration-150
+                
+            `}
+            onClick={() => setIsModalOpen(true)}
+            aria-label={`Add new task to ${title}`}
+            >
+            <PlusIcon className="h-4 w-4" aria-hidden="true" />
+            </button>
+        </span>
+        </h2>
 
             {/* Task List */}
-            <div className="overflow-y-auto max-h-[50vh] pr-2 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+            <div className="relative overflow-y-auto max-h-[50vh] pr-2 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent py-2">
                 {sortedTasks.length > 0 ? (
                     sortedTasks.map(task => (
                         <KanbanTask
